@@ -1,28 +1,47 @@
 # Instagram Reels Tab Removal Patch
 
-This repository contains information and a patch to remove the Reels tab from the Instagram Android application.
+This repository contains the patched Instagram APK and instructions on how the patch was applied.
 
-## Overview
+## Download
 
-The Reels tab is removed by modifying the `InstagramMainActivity` smali code to skip the creation and addition of the `CLIPS` tab during the navigation bar construction loop.
+You can find the patched APK in the [Releases](https://github.com/mhmudxnasr/IG-WO/releases) section of this repository.
 
-## How it Works
+## Patch Details
 
-The patch intercepts the tab iteration loop in `com.instagram.mainactivity.InstagramMainActivity` and checks if the current tab is `A09` (Clips) from the `LX/3aj` enum. If it is, the loop increment is called immediately, skipping the UI creation for that tab.
+The Reels tab was removed by modifying `com.instagram.mainactivity.InstagramMainActivity.smali`. 
 
-## Tools Required
+The patch intercepts the loop that constructs the bottom navigation bar and skips the `CLIPS` tab (represented by the `A09` instance of the `LX/3aj` enum).
+
+```diff
+     .line 6930
+     check-cast v4, LX/3aj;
+ 
++    sget-object v0, LX/3aj;->A09:LX/3aj;
++
++    if-ne v4, v0, :cond_skip_reels
++
++    add-int/lit8 v10, v10, 0x1
++
++    goto :goto_3c
++
++    :cond_skip_reels
++
+     .line 6931
+     .line 6932
+     invoke-virtual {v1}, Lcom/instagram/mainactivity/InstagramMainActivity;->A1O()Landroid/view/ViewGroup;
+```
+
+## Installation Instructions
+
+> [!IMPORTANT]
+> Because the APK has been resigned with a debug key, you **must** uninstall the original Instagram application from your device before installing the patched version.
+
+1.  Download `instagram_patched-aligned-debugSigned.apk` from the Releases section.
+2.  Uninstall the existing Instagram app.
+3.  Install the patched APK.
+4.  Open the app and verify that the Reels (Clips) tab is no longer present.
+
+## Tools Used
 
 - [Apktool](https://github.com/iBotPeaches/Apktool)
 - [Uber-APK-Signer](https://github.com/patrickfav/uber-apk-signer)
-- JDK 17+
-
-## Usage Instructions
-
-1. Decompile the target Instagram APK using `apktool`.
-2. Apply the smali patch to `com.instagram.mainactivity.InstagramMainActivity.smali`.
-3. Rebuild the APK using `apktool`.
-4. Sign the APK using `uber-apk-signer`.
-
-## Disclaimer
-
-This project is for educational purposes only. Modifying third-party applications may violate their terms of service.
